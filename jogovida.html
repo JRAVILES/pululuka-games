@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>🎲 Caminho da Vida</title>
+    <style>
+      body {
+        font-family: Arial;
+        text-align: center;
+        background: #e8f7ff;
+      }
+      #tabuleiro {
+        display: grid;
+        grid-template-columns: repeat(10, 60px);
+        grid-gap: 3px;
+        margin: 20px auto;
+      }
+      .casa {
+        width: 60px;
+        height: 60px;
+        background: #d0ebff;
+        border: 1px solid #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+      .casa span {
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        font-size: 10px;
+        color: #333;
+      }
+      .bonus {
+        background: #b9fbc0;
+      }
+      .punicao {
+        background: #ffb4b4;
+      }
+      .piao {
+        position: absolute;
+        bottom: 4px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      .piao img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+      }
+      #dados {
+        margin: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+      }
+      .dado {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .dado img {
+        width: 55px;
+        height: 55px;
+      }
+      button {
+        margin: 20px;
+        padding: 20px 40px;
+        font-size: 22px;
+        cursor: pointer;
+        border-radius: 12px;
+        border: 2px solid #222;
+        background: linear-gradient(135deg, #0066ff, #00ccff);
+        color: #fff;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px #000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+      #jogadorAtivo {
+        font-size: 24px;
+        margin-top: 10px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      #jogadorAtivo img {
+        width: 30px;
+        height: 30px;
+      }
+      #mensagem {
+        font-size: 20px;
+        margin-top: 10px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎲 Caminho da Vida</h1>
+    <div id="dados">
+      <div
+        id="dadoBranco"
+        class="dado"
+        ><img
+          src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Dice-1-b.svg"
+      /></div>
+      <div
+        id="dadoAzul"
+        class="dado"
+        ><img
+          src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Dice-1-b.svg"
+      /></div>
+    </div>
+    <div id="tabuleiro"></div>
+    <button id="jogar">Jogar Dados</button>
+    <div id="jogadorAtivo"></div>
+    <div id="mensagem"></div>
+
+    <script>
+      const pioes = [
+        'https://cdn-icons-png.flaticon.com/512/616/616408.png', // cachorro
+        'https://cdn-icons-png.flaticon.com/512/616/616430.png', // gato
+      ];
+
+      let numJogadores = 2;
+
+      const tabuleiro = document.getElementById('tabuleiro');
+      const jogadorAtivo = document.getElementById('jogadorAtivo');
+      const mensagem = document.getElementById('mensagem');
+      const dadoBrancoEl = document
+        .getElementById('dadoBranco')
+        .querySelector('img');
+      const dadoAzulEl = document
+        .getElementById('dadoAzul')
+        .querySelector('img');
+
+      const casas = 60;
+      const posicoes = Array(numJogadores).fill(0);
+      const bonus = new Set(
+        Array.from({ length: 8 }, () => Math.floor(Math.random() * casas))
+      );
+      const punicoes = new Set(
+        Array.from({ length: 8 }, () => Math.floor(Math.random() * casas))
+      );
+
+      const dadoImagens = [
+        'https://upload.wikimedia.org/wikipedia/commons/1/1b/Dice-1-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/5/5f/Dice-2-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/b/b1/Dice-3-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/f/fd/Dice-4-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/0/08/Dice-5-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/2/26/Dice-6-b.svg',
+      ];
+
+      let linhas = 6;
+      let sentido = 1;
+      for (let l = 0; l < linhas; l++) {
+        let inicio = l * 10;
+        let faixa = Array.from({ length: 10 }, (_, i) => inicio + i);
+        if (sentido === -1) faixa.reverse();
+        faixa.forEach((i) => {
+          const div = document.createElement('div');
+          div.classList.add('casa');
+          if (bonus.has(i)) div.classList.add('bonus');
+          if (punicoes.has(i)) div.classList.add('punicao');
+          div.id = 'casa-' + i;
+          const num = document.createElement('span');
+          num.textContent = i + 1;
+          div.appendChild(num);
+          tabuleiro.appendChild(div);
+        });
+        sentido *= -1;
+      }
+
+      let jogadorAtual = 0;
+      atualizar();
+
+      document.getElementById('jogar').onclick = async () => {
+        await animarDados();
+        const dadoBranco = Math.ceil(Math.random() * 6);
+        const dadoAzul = Math.ceil(Math.random() * 6);
+        dadoBrancoEl.src = dadoImagens[dadoBranco - 1];
+        dadoAzulEl.src = dadoImagens[dadoAzul - 1];
+        const soma = dadoBranco + dadoAzul;
+
+        moverJogador(jogadorAtual, soma);
+      };
+
+      async function animarDados() {
+        for (let i = 0; i < 10; i++) {
+          dadoBrancoEl.src = dadoImagens[Math.floor(Math.random() * 6)];
+          dadoAzulEl.src = dadoImagens[Math.floor(Math.random() * 6)];
+          await new Promise((r) => setTimeout(r, 100));
+        }
+      }
+
+      async function moverJogador(idx, passos) {
+        const alvo = Math.min(posicoes[idx] + passos, casas - 1);
+        while (posicoes[idx] < alvo) {
+          posicoes[idx]++;
+          atualizar(`Jogador ${idx + 1} moveu para casa ${posicoes[idx] + 1}`);
+          await new Promise((r) => setTimeout(r, 200));
+        }
+
+        let pos = posicoes[idx];
+        let msg = `Jogador ${idx + 1} chegou à casa ${pos + 1}.`;
+
+        if (bonus.has(pos)) {
+          msg += ' 🍀 Sorte! Avance 2 casas!';
+          mensagem.style.color = 'green';
+          mensagem.style.fontWeight = 'bold';
+          posicoes[idx] = Math.min(posicoes[idx] + 2, casas - 1);
+        } else if (punicoes.has(pos)) {
+          msg += ' 💀 Revés! Volte 2 casas!';
+          mensagem.style.color = 'red';
+          mensagem.style.fontWeight = 'bold';
+          posicoes[idx] = Math.max(posicoes[idx] - 2, 0);
+        } else {
+          mensagem.style.color = '#333';
+          mensagem.style.fontWeight = 'normal';
+        }
+
+        if (posicoes[idx] === casas - 1) {
+          alert(`🏁 Jogador ${idx + 1} venceu!`);
+          location.reload();
+          return;
+        }
+
+        jogadorAtual = (jogadorAtual + 1) % numJogadores;
+        atualizar(msg);
+      }
+
+      function atualizar(msg = '') {
+        document
+          .querySelectorAll('.casa')
+          .forEach((c) =>
+            c.querySelectorAll('.piao').forEach((p) => p.remove())
+          );
+        posicoes.forEach((pos, i) => {
+          const casa = document.getElementById('casa-' + pos);
+          if (!casa) return;
+          const piao = document.createElement('div');
+          piao.classList.add('piao');
+          const img = document.createElement('img');
+          img.src = pioes[i];
+          piao.appendChild(img);
+          casa.appendChild(piao);
+        });
+        const imgAtual = document.createElement('img');
+        imgAtual.src = pioes[jogadorAtual];
+        jogadorAtivo.innerHTML = '';
+        jogadorAtivo.appendChild(imgAtual);
+        const txt = document.createElement('span');
+        txt.textContent = ` É a vez do Jogador ${jogadorAtual + 1}`;
+        jogadorAtivo.appendChild(txt);
+        mensagem.innerHTML = msg;
+      }
+    </script>
+  </body>
+</html>
