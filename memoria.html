@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>Jogo da Memória 🧠✨</title>
+    <style>
+      :root {
+        --bg: #f7f7ff;
+        --card: #ffffff;
+        --accent: #6c5ce7;
+        --ok: #00b894;
+        --text: #2d3436;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        background: radial-gradient(
+            1200px 600px at 20% -10%,
+            #e8f0ff 0,
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+        display: flex;
+        min-height: 100svh;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .wrap {
+        width: 100%;
+        max-width: 900px;
+      }
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: clamp(20px, 4vw, 32px);
+      }
+      .panel {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        background: #fff;
+        border: 2px solid #00000010;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+        box-shadow: 0 6px 16px #0000000f;
+      }
+      button {
+        appearance: none;
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 800;
+        padding: 10px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px #6c5ce733;
+        transition: 0.15s transform, 0.15s filter;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .grid {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+        grid-template-columns: repeat(5, 1fr);
+      }
+      @media (max-width: 520px) {
+        .grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .card {
+        position: relative;
+        aspect-ratio: 1/1;
+        perspective: 800px;
+        cursor: pointer;
+      }
+      .face {
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: clamp(32px, 8vw, 56px);
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        transition: transform 0.35s ease, box-shadow 0.3s ease;
+        box-shadow: 0 10px 24px #00000014, inset 0 0 0 2px #00000010;
+      }
+      .front {
+        background: linear-gradient(120deg, #ffd6e7, #d6e6ff);
+        color: #000;
+      }
+      .back {
+        background: var(--card);
+        transform: rotateY(180deg);
+      }
+      .card.flipped .front {
+        transform: rotateY(180deg);
+      }
+      .card.flipped .back {
+        transform: rotateY(360deg);
+      }
+      .card.matched .back {
+        outline: 3px solid var(--ok);
+        box-shadow: 0 10px 24px #00b89433, inset 0 0 0 2px #00b89455;
+      }
+      .win {
+        position: fixed;
+        inset: 0;
+        background: #00000080;
+        display: none;
+        place-items: center;
+        z-index: 5;
+      }
+      .win.show {
+        display: grid;
+      }
+      .winbox {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        text-align: center;
+        max-width: 520px;
+        width: 100%;
+      }
+      .big {
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 900;
+        margin: 0 0 10px;
+      }
+      .sub {
+        opacity: 0.8;
+        margin: 0 0 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="title"
+          >🧠 Jogo da Memória <span aria-hidden="true">✨</span></div
+        >
+        <div class="panel">
+          <div
+            class="pill"
+            id="moves"
+            >Movimentos: 0</div
+          >
+          <div
+            class="pill"
+            id="time"
+            >Tempo: 0s</div
+          >
+          <button id="btnReset">Reiniciar</button>
+        </div>
+      </header>
+
+      <div
+        class="grid"
+        id="grid"
+      ></div>
+
+      <div
+        class="win"
+        id="win"
+      >
+        <div class="winbox">
+          <p class="big">🎉 Parabéns! Você venceu!</p>
+          <p
+            class="sub"
+            id="stats"
+          ></p>
+          <button id="btnAgain">Jogar de novo</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const EMOJIS = [
+          '🐶',
+          '🐱',
+          '🐭',
+          '🐹',
+          '🐰',
+          '🦊',
+          '🐼',
+          '🦄',
+          '🐤',
+          '🐸',
+          '🍓',
+          '🍌',
+          '🚗',
+          '🚀',
+          '⚽',
+          '🎈',
+          '🌻',
+          '🦋',
+          '🍰',
+          '🍕',
+          '🎁',
+          '🐢',
+        ];
+        const gridEl = document.getElementById('grid');
+        const movesEl = document.getElementById('moves');
+        const timeEl = document.getElementById('time');
+        const winEl = document.getElementById('win');
+        const statsEl = document.getElementById('stats');
+        const btnReset = document.getElementById('btnReset');
+        const btnAgain = document.getElementById('btnAgain');
+
+        // agora são 10 pares
+        let PAIRS = 10;
+
+        let first = null,
+          second = null,
+          lock = false,
+          found = 0,
+          moves = 0,
+          startAt = null,
+          timerId = null;
+
+        function randPairs(n) {
+          const picked = EMOJIS.sort(() => Math.random() - 0.5).slice(0, n);
+          const pool = [...picked, ...picked];
+          for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+          }
+          return pool;
+        }
+
+        function makeCard(symbol) {
+          const card = document.createElement('button');
+          card.className = 'card';
+          card.innerHTML = `
+      <span class="face front">❓</span>
+      <span class="face back">${symbol}</span>
+    `;
+          card.addEventListener('click', () => onFlip(card));
+          return card;
+        }
+
+        function onFlip(card) {
+          if (
+            lock ||
+            card.classList.contains('flipped') ||
+            card.classList.contains('matched')
+          )
+            return;
+          if (!startAt) {
+            startAt = Date.now();
+            startTimer();
+          }
+
+          card.classList.add('flipped');
+
+          if (!first) {
+            first = card;
+            return;
+          }
+          if (card === first) return;
+
+          second = card;
+          moves++;
+          movesEl.textContent = 'Movimentos: ' + moves;
+
+          const a = first.querySelector('.back').textContent;
+          const b = second.querySelector('.back').textContent;
+
+          if (a === b) {
+            first.classList.add('matched');
+            second.classList.add('matched');
+            first = second = null;
+            found++;
+            if (found === PAIRS) win();
+          } else {
+            lock = true;
+            setTimeout(() => {
+              first.classList.remove('flipped');
+              second.classList.remove('flipped');
+              first = second = null;
+              lock = false;
+            }, 700);
+          }
+        }
+
+        function startTimer() {
+          stopTimer();
+          timerId = setInterval(() => {
+            const secs = Math.floor((Date.now() - startAt) / 1000);
+            timeEl.textContent = 'Tempo: ' + secs + 's';
+          }, 250);
+        }
+        function stopTimer() {
+          if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+          }
+        }
+
+        function win() {
+          stopTimer();
+          const secs = Math.floor((Date.now() - startAt) / 1000);
+          statsEl.textContent = `Você fez ${moves} movimentos em ${secs}s.`;
+          winEl.classList.add('show');
+        }
+
+        function setup() {
+          gridEl.innerHTML = '';
+          winEl.classList.remove('show');
+          moves = 0;
+          found = 0;
+          first = second = null;
+          lock = false;
+          startAt = null;
+          movesEl.textContent = 'Movimentos: 0';
+          timeEl.textContent = 'Tempo: 0s';
+          stopTimer();
+
+          const symbols = randPairs(PAIRS);
+          symbols.forEach((s) => gridEl.appendChild(makeCard(s)));
+        }
+
+        btnReset.addEventListener('click', setup);
+        btnAgain.addEventListener('click', setup);
+        setup();
+      })();
+    </script>
+  </body>
+</html>
