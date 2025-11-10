@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Jogo da Velha</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        color: #667eea;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .mode-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .mode-btn {
+        flex: 1;
+        padding: 12px;
+        font-size: 1em;
+        font-weight: bold;
+        background: #e0e7ff;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .mode-btn:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .mode-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .difficulty-selector {
+        display: none;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .difficulty-selector.active {
+        display: flex;
+      }
+
+      .difficulty-btn {
+        flex: 1;
+        padding: 10px;
+        font-size: 0.9em;
+        font-weight: bold;
+        background: #fff5f5;
+        color: #f5576c;
+        border: 2px solid #f5576c;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .difficulty-btn:hover {
+        background: #f5576c;
+        color: white;
+      }
+
+      .difficulty-btn.active {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .status {
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: 30px;
+        padding: 15px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 10px;
+        font-weight: bold;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .status.winner {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        animation: pulse 1s infinite;
+      }
+
+      .status.draw {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .cell {
+        aspect-ratio: 1;
+        background: linear-gradient(135deg, #e0e7ff 0%, #cfd9ff 100%);
+        border: none;
+        border-radius: 15px;
+        font-size: 4em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .cell:hover:not(:disabled) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .cell:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+
+      .cell.x {
+        color: #667eea;
+        animation: popIn 0.3s ease;
+      }
+
+      .cell.o {
+        color: #f5576c;
+        animation: popIn 0.3s ease;
+      }
+
+      @keyframes popIn {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .cell.winner {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        animation: winnerGlow 1s ease-in-out infinite;
+      }
+
+      @keyframes winnerGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+        }
+      }
+
+      .winning-line {
+        position: absolute;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          #ffd700,
+          #ffd700,
+          transparent
+        );
+        border-radius: 10px;
+        animation: drawLine 0.5s ease-out, glowLine 1.5s ease-in-out infinite;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      @keyframes drawLine {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @keyframes glowLine {
+        0%,
+        100% {
+          opacity: 0.8;
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        50% {
+          opacity: 1;
+          box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+        }
+      }
+
+      .reset-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2em;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .reset-btn:active {
+        transform: translateY(0);
+      }
+
+      .score {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f7fafc;
+        border-radius: 10px;
+      }
+
+      .score-item {
+        text-align: center;
+      }
+
+      .score-label {
+        font-size: 0.9em;
+        color: #718096;
+        margin-bottom: 5px;
+      }
+
+      .score-value {
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+
+      .score-x {
+        color: #667eea;
+      }
+
+      .score-o {
+        color: #f5576c;
+      }
+
+      .score-draw {
+        color: #f6ad55;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎮 Jogo da Velha</h1>
+
+      <div class="mode-selector">
+        <button
+          class="mode-btn active"
+          data-mode="2players"
+          >👥 2 Jogadores</button
+        >
+        <button
+          class="mode-btn"
+          data-mode="1player"
+          >🤖 vs Computador</button
+        >
+      </div>
+
+      <div
+        class="difficulty-selector"
+        id="difficultySelector"
+      >
+        <button
+          class="difficulty-btn active"
+          data-difficulty="easy"
+          >Fácil</button
+        >
+        <button
+          class="difficulty-btn"
+          data-difficulty="medium"
+          >Médio</button
+        >
+        <button
+          class="difficulty-btn"
+          data-difficulty="hard"
+          >Difícil</button
+        >
+      </div>
+
+      <div
+        class="status"
+        id="status"
+      >
+        Vez do jogador: X
+      </div>
+
+      <div
+        class="board"
+        id="board"
+      >
+        <button
+          class="cell"
+          data-index="0"
+        ></button>
+        <button
+          class="cell"
+          data-index="1"
+        ></button>
+        <button
+          class="cell"
+          data-index="2"
+        ></button>
+        <button
+          class="cell"
+          data-index="3"
+        ></button>
+        <button
+          class="cell"
+          data-index="4"
+        ></button>
+        <button
+          class="cell"
+          data-index="5"
+        ></button>
+        <button
+          class="cell"
+          data-index="6"
+        ></button>
+        <button
+          class="cell"
+          data-index="7"
+        ></button>
+        <button
+          class="cell"
+          data-index="8"
+        ></button>
+      </div>
+
+      <button
+        class="reset-btn"
+        id="resetBtn"
+        >🔄 Novo Jogo</button
+      >
+
+      <div class="score">
+        <div class="score-item">
+          <div class="score-label">Jogador X</div>
+          <div
+            class="score-value score-x"
+            id="scoreX"
+            >0</div
+          >
+        </div>
+        <div class="score-item">
+          <div class="score-label">Empates</div>
+          <div
+            class="score-value score-draw"
+            id="scoreDraw"
+            >0</div
+          >
+        </div>
+        <div class="score-item">
+          <div class="score-label">Jogador O</div>
+          <div
+            class="score-value score-o"
+            id="scoreO"
+            >0</div
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class TicTacToe {
+        constructor() {
+          this.board = Array(9).fill(null);
+          this.currentPlayer = 'X';
+          this.gameOver = false;
+          this.gameMode = '2players'; // '2players' ou '1player'
+          this.difficulty = 'easy'; // 'easy', 'medium', 'hard'
+          this.scores = {
+            X: 0,
+            O: 0,
+            draw: 0,
+          };
+
+          this.winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8], // linhas
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8], // colunas
+            [0, 4, 8],
+            [2, 4, 6], // diagonais
+          ];
+
+          this.cells = document.querySelectorAll('.cell');
+          this.statusElement = document.getElementById('status');
+          this.resetBtn = document.getElementById('resetBtn');
+          this.scoreXElement = document.getElementById('scoreX');
+          this.scoreOElement = document.getElementById('scoreO');
+          this.scoreDrawElement = document.getElementById('scoreDraw');
+          this.modeBtns = document.querySelectorAll('.mode-btn');
+          this.difficultyBtns = document.querySelectorAll('.difficulty-btn');
+          this.difficultySelector =
+            document.getElementById('difficultySelector');
+
+          this.init();
+        }
+
+        init() {
+          this.cells.forEach((cell) => {
+            cell.addEventListener('click', (e) => this.handleClick(e));
+          });
+
+          this.resetBtn.addEventListener('click', () => this.resetGame());
+
+          this.modeBtns.forEach((btn) => {
+            btn.addEventListener('click', (e) => this.changeMode(e));
+          });
+
+          this.difficultyBtns.forEach((btn) => {
+            btn.addEventListener('click', (e) => this.changeDifficulty(e));
+          });
+        }
+
+        changeMode(e) {
+          const mode = e.target.dataset.mode;
+          this.gameMode = mode;
+
+          this.modeBtns.forEach((btn) => btn.classList.remove('active'));
+          e.target.classList.add('active');
+
+          if (mode === '1player') {
+            this.difficultySelector.classList.add('active');
+          } else {
+            this.difficultySelector.classList.remove('active');
+          }
+
+          this.resetGame();
+        }
+
+        changeDifficulty(e) {
+          this.difficulty = e.target.dataset.difficulty;
+          this.difficultyBtns.forEach((btn) => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          this.resetGame();
+        }
+
+        handleClick(e) {
+          const index = parseInt(e.target.dataset.index);
+
+          if (this.board[index] || this.gameOver) return;
+
+          this.makeMove(index);
+        }
+
+        makeMove(index) {
+          this.board[index] = this.currentPlayer;
+          const cell = this.cells[index];
+          cell.textContent = this.currentPlayer;
+          cell.classList.add(this.currentPlayer.toLowerCase());
+          cell.disabled = true;
+
+          const result = this.checkWinner();
+          if (result) {
+            this.endGame(result.winner, result.combination);
+            return;
+          }
+
+          if (this.isBoardFull()) {
+            this.endGame('draw');
+            return;
+          }
+
+          this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+          this.updateStatus();
+
+          // Se for modo 1 jogador e for a vez do computador
+          if (this.gameMode === '1player' && this.currentPlayer === 'O') {
+            this.cells.forEach((cell) => (cell.disabled = true));
+            setTimeout(() => {
+              this.computerMove();
+              this.cells.forEach((cell) => {
+                if (!cell.textContent) cell.disabled = false;
+              });
+            }, 500);
+          }
+        }
+
+        computerMove() {
+          if (this.gameOver) return;
+
+          let move;
+
+          switch (this.difficulty) {
+            case 'easy':
+              move = this.getRandomMove();
+              break;
+            case 'medium':
+              move =
+                Math.random() < 0.5 ? this.getBestMove() : this.getRandomMove();
+              break;
+            case 'hard':
+              move = this.getBestMove();
+              break;
+          }
+
+          if (move !== -1) {
+            this.makeMove(move);
+          }
+        }
+
+        getRandomMove() {
+          const availableMoves = this.board
+            .map((val, idx) => (val === null ? idx : null))
+            .filter((val) => val !== null);
+
+          return availableMoves.length > 0
+            ? availableMoves[Math.floor(Math.random() * availableMoves.length)]
+            : -1;
+        }
+
+        getBestMove() {
+          // Minimax algorithm
+          let bestScore = -Infinity;
+          let bestMove = -1;
+
+          for (let i = 0; i < 9; i++) {
+            if (this.board[i] === null) {
+              this.board[i] = 'O';
+              let score = this.minimax(this.board, 0, false);
+              this.board[i] = null;
+
+              if (score > bestScore) {
+                bestScore = score;
+                bestMove = i;
+              }
+            }
+          }
+
+          return bestMove;
+        }
+
+        minimax(board, depth, isMaximizing) {
+          const result = this.checkWinner();
+
+          if (result && result.winner === 'O') return 10 - depth;
+          if (result && result.winner === 'X') return depth - 10;
+          if (this.isBoardFull()) return 0;
+
+          if (isMaximizing) {
+            let bestScore = -Infinity;
+            for (let i = 0; i < 9; i++) {
+              if (board[i] === null) {
+                board[i] = 'O';
+                let score = this.minimax(board, depth + 1, false);
+                board[i] = null;
+                bestScore = Math.max(score, bestScore);
+              }
+            }
+            return bestScore;
+          } else {
+            let bestScore = Infinity;
+            for (let i = 0; i < 9; i++) {
+              if (board[i] === null) {
+                board[i] = 'X';
+                let score = this.minimax(board, depth + 1, true);
+                board[i] = null;
+                bestScore = Math.min(score, bestScore);
+              }
+            }
+            return bestScore;
+          }
+        }
+
+        checkWinner() {
+          for (const combo of this.winningCombinations) {
+            const [a, b, c] = combo;
+            if (
+              this.board[a] &&
+              this.board[a] === this.board[b] &&
+              this.board[a] === this.board[c]
+            ) {
+              return { winner: this.board[a], combination: combo };
+            }
+          }
+          return null;
+        }
+
+        isBoardFull() {
+          return this.board.every((cell) => cell !== null);
+        }
+
+        endGame(result, combination = null) {
+          this.gameOver = true;
+
+          if (result === 'draw') {
+            this.scores.draw++;
+            this.statusElement.textContent = '🤝 Empate!';
+            this.statusElement.classList.add('draw');
+            this.scoreDrawElement.textContent = this.scores.draw;
+          } else {
+            this.scores[result]++;
+
+            if (this.gameMode === '1player') {
+              if (result === 'X') {
+                this.statusElement.textContent = '🎉 Você venceu!';
+              } else {
+                this.statusElement.textContent = '🤖 Computador venceu!';
+              }
+            } else {
+              this.statusElement.textContent = `🎉 Jogador ${result} venceu!`;
+            }
+
+            this.statusElement.classList.add('winner');
+
+            // Destacar células vencedoras
+            if (combination) {
+              combination.forEach((index) => {
+                this.cells[index].classList.add('winner');
+              });
+              this.drawWinningLine(combination);
+            }
+
+            if (result === 'X') {
+              this.scoreXElement.textContent = this.scores.X;
+            } else {
+              this.scoreOElement.textContent = this.scores.O;
+            }
+          }
+
+          this.cells.forEach((cell) => (cell.disabled = true));
+        }
+
+        drawWinningLine(combination) {
+          const boardElement = document.getElementById('board');
+
+          // Remove linha anterior se existir
+          const oldLine = boardElement.querySelector('.winning-line');
+          if (oldLine) oldLine.remove();
+
+          const line = document.createElement('div');
+          line.className = 'winning-line';
+
+          // Calcula posição e orientação da linha baseado na combinação
+          const positions = {
+            // Linhas horizontais
+            '0,1,2': {
+              top: '16.6%',
+              left: '10%',
+              width: '80%',
+              height: '8px',
+              rotate: '0deg',
+            },
+            '3,4,5': {
+              top: '50%',
+              left: '10%',
+              width: '80%',
+              height: '8px',
+              rotate: '0deg',
+            },
+            '6,7,8': {
+              top: '83.4%',
+              left: '10%',
+              width: '80%',
+              height: '8px',
+              rotate: '0deg',
+            },
+            // Linhas verticais
+            '0,3,6': {
+              top: '10%',
+              left: '16.6%',
+              width: '8px',
+              height: '80%',
+              rotate: '0deg',
+            },
+            '1,4,7': {
+              top: '10%',
+              left: '50%',
+              width: '8px',
+              height: '80%',
+              rotate: '0deg',
+            },
+            '2,5,8': {
+              top: '10%',
+              left: '83.4%',
+              width: '8px',
+              height: '80%',
+              rotate: '0deg',
+            },
+            // Diagonais
+            '0,4,8': {
+              top: '50%',
+              left: '50%',
+              width: '110%',
+              height: '8px',
+              rotate: '45deg',
+            },
+            '2,4,6': {
+              top: '50%',
+              left: '50%',
+              width: '110%',
+              height: '8px',
+              rotate: '-45deg',
+            },
+          };
+
+          const key = combination.join(',');
+          const pos = positions[key];
+
+          if (pos) {
+            line.style.top = pos.top;
+            line.style.left = pos.left;
+            line.style.width = pos.width;
+            line.style.height = pos.height;
+            line.style.transform = `translate(-50%, -50%) rotate(${pos.rotate})`;
+            line.style.transformOrigin = 'center';
+
+            boardElement.appendChild(line);
+          }
+        }
+
+        updateStatus() {
+          if (this.gameMode === '1player') {
+            this.statusElement.textContent =
+              this.currentPlayer === 'X'
+                ? 'Sua vez!'
+                : 'Computador pensando...';
+          } else {
+            this.statusElement.textContent = `Vez do jogador: ${this.currentPlayer}`;
+          }
+        }
+
+        resetGame() {
+          this.board = Array(9).fill(null);
+          this.currentPlayer = 'X';
+          this.gameOver = false;
+
+          this.cells.forEach((cell) => {
+            cell.textContent = '';
+            cell.disabled = false;
+            cell.classList.remove('x', 'o', 'winner');
+          });
+
+          // Remove linha vencedora
+          const boardElement = document.getElementById('board');
+          const oldLine = boardElement.querySelector('.winning-line');
+          if (oldLine) oldLine.remove();
+
+          this.statusElement.textContent = 'Vez do jogador: X';
+          this.statusElement.classList.remove('winner', 'draw');
+        }
+      }
+
+      // Inicializa o jogo quando a página carregar
+      window.addEventListener('DOMContentLoaded', () => {
+        new TicTacToe();
+      });
+    </script>
+  </body>
+</html>
