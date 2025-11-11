@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Corrida Sprunk - Jogo de Percurso</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --violeta: #7b5dff;
+        --rosa: #ff7bb0;
+        --verde: #33dfb0;
+        --azul: #44bfff;
+        --amarelo: #ffe766;
+        --laranja: #ffb347;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: radial-gradient(circle at 15% 20%, #fff5fb, #ffeab3 70%);
+        margin: 0;
+        padding: clamp(4px, 1vw, 8px);
+        color: #1a1030;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 0;
+        color: #3c1768;
+      }
+
+      .descricao,
+      .tag-percurso {
+        text-align: center;
+        margin: 6px auto;
+        max-width: 900px;
+        color: #4a2c75;
+      }
+
+      .tag-percurso strong {
+        color: #ff4085;
+      }
+
+      .setup {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        gap: 60px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: clamp(12px, 2vw, 20px);
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 16px 40px rgba(114, 76, 213, 0.16);
+        max-width: 1400px;
+        margin: 0 auto 20px;
+      }
+
+      .setup.hidden {
+        display: none;
+      }
+
+      .player-config h2 {
+        margin: 0 0 4px;
+      }
+
+      .player-config p {
+        margin: 0 0 10px;
+        color: #5d4389;
+        font-size: 14px;
+      }
+
+      .personagem-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .personagem-card {
+        border: 2px solid transparent;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+        min-height: 130px;
+      }
+
+      .personagem-card img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+      }
+
+      .personagem-card strong {
+        font-size: 14px;
+      }
+
+      .personagem-card small {
+        font-size: 11px;
+        color: #6a4b90;
+      }
+
+      .personagem-card.selected {
+        border-color: var(--verde);
+        box-shadow: 0 0 14px rgba(51, 223, 176, 0.5);
+        transform: translateY(-3px);
+      }
+
+      .personagem-card.bloqueado {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .preview-card {
+        margin-top: 8px;
+        padding: 10px;
+        border-radius: 16px;
+        border: 1px dashed rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-height: 70px;
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .preview-card img {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.04);
+        padding: 4px;
+      }
+
+      .setup-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: center;
+        padding-top: 4px;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        border-radius: 14px;
+        padding: 12px 26px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      #iniciarJogo {
+        background: linear-gradient(135deg, var(--rosa), var(--violeta));
+        color: #fff;
+        min-width: 200px;
+      }
+
+      #iniciarJogo:not(:disabled):hover,
+      #rolarDados:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .painel-principal {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      .painel-principal.hidden {
+        display: none;
+      }
+
+      .acoes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 18px 28px rgba(122, 93, 255, 0.12);
+      }
+
+      #rolarDados {
+        background: linear-gradient(135deg, var(--verde), var(--azul));
+        color: #083436;
+      }
+
+      .dado-visivel {
+        width: 84px;
+        height: 84px;
+        border-radius: 22px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+        font-weight: 600;
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .game-area {
+        display: grid;
+        grid-template-columns: minmax(520px, 1fr) minmax(220px, 260px);
+        gap: 14px;
+      }
+
+      .mapa-wrapper {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        padding: clamp(10px, 2vw, 20px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 25px 35px rgba(79, 52, 170, 0.18);
+      }
+
+      .mapa-real {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 5 / 3;
+        border-radius: 26px;
+        background: radial-gradient(
+          circle at 20% 25%,
+          rgba(255, 255, 255, 0.65),
+          rgba(255, 255, 255, 0.35)
+        );
+        overflow: hidden;
+      }
+
+      #rota {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #rota path.track {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.85);
+        stroke-width: 14;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.4));
+      }
+
+      #rota path.border {
+        fill: none;
+        stroke: #f4a913;
+        stroke-width: 6;
+        stroke-dasharray: 16 8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+      }
+
+      #tabuleiro {
+        position: absolute;
+        inset: 0;
+      }
+
+      .casa {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        min-width: 90px;
+        padding: 8px 10px 10px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        font-size: 11px;
+      }
+
+      .casa.tema {
+        background: rgba(153, 129, 252, 0.95);
+        color: #fff;
+      }
+
+      .casa.sorte {
+        background: rgba(96, 245, 197, 0.95);
+        color: #063932;
+      }
+
+      .casa.reves {
+        background: rgba(255, 157, 180, 0.95);
+      }
+
+      .casa.meta {
+        background: linear-gradient(135deg, var(--amarelo), var(--laranja));
+        color: #422608;
+        font-weight: 600;
+      }
+
+      .casa .numero {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        font-size: 10px;
+        color: rgba(0, 0, 0, 0.45);
+      }
+
+      .piao-area {
+        margin-top: 4px;
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+
+      .piao {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .piao img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      aside > div {
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 20px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 18px 24px rgba(80, 62, 131, 0.14);
+        margin-bottom: 10px;
+      }
+
+      .carta-atual {
+        border-radius: 16px;
+        padding: 12px;
+        min-height: 110px;
+        border: 1px dashed rgba(0, 0, 0, 0.1);
+      }
+
+      .carta-atual.sorte-card {
+        background: linear-gradient(135deg, #c2ffe2, #7dffd7);
+        border-color: transparent;
+        color: #053830;
+      }
+
+      .carta-atual.reves-card {
+        background: linear-gradient(135deg, #ffd4df, #ff99c2);
+        border-color: transparent;
+        color: #5c0f2d;
+      }
+
+      .historico ul {
+        max-height: 200px;
+        overflow-y: auto;
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      @media (max-width: 1100px) {
+        .game-area {
+          grid-template-columns: 1fr;
+        }
+
+        .mapa-real {
+          aspect-ratio: 4 / 3;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Corrida Sprunk</h1>
+    <p class="descricao">
+      Conduza dois performers sprunkis por um circuito sinuoso lançando dados,
+      encarando casas temáticas e cartas surpresa até chegar ao Grande Palco.
+    </p>
+    <p class="tag-percurso">
+      Categoria: <strong>Jogo de Percurso</strong> (roll and move)
+    </p>
+
+    <section class="setup">
+      <div class="player-config">
+        <h2>Jogador 1</h2>
+        <p>Escolha um performer Sprunk.</p>
+        <div
+          class="personagem-grid"
+          id="lista1"
+        ></div>
+        <div
+          class="preview-card"
+          id="preview1"
+        >
+          <span>Selecione um personagem.</span>
+        </div>
+      </div>
+      <div class="player-config">
+        <h2>Jogador 2</h2>
+        <p>Escolha outro performer.</p>
+        <div
+          class="personagem-grid"
+          id="lista2"
+        ></div>
+        <div
+          class="preview-card"
+          id="preview2"
+        >
+          <span>Selecione um personagem.</span>
+        </div>
+      </div>
+      <div class="setup-actions">
+        <button
+          id="iniciarJogo"
+          disabled
+          >Iniciar Partida</button
+        >
+      </div>
+    </section>
+
+    <section class="painel-principal hidden">
+      <div class="acoes">
+        <button
+          id="rolarDados"
+          disabled
+          >🎲 Lançar Dados</button
+        >
+        <div
+          class="dado-visivel"
+          id="valorDado"
+          >-</div
+        >
+        <div
+          class="status-turno"
+          id="statusTurno"
+        >
+          Aguarde a escolha e confirme a partida.
+        </div>
+      </div>
+
+      <div class="game-area">
+        <div class="mapa-wrapper">
+          <div class="mapa-real">
+            <svg
+              id="rota"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            ></svg>
+            <div id="tabuleiro"></div>
+          </div>
+        </div>
+        <aside>
+          <div class="mensagens">
+            <h3>Feed de jogo</h3>
+            <p id="mensagem"
+              >Selecione dois performers para liberar o tabuleiro.</p
+            >
+          </div>
+          <div class="cartas">
+            <h3>Carta sorteada</h3>
+            <div
+              class="carta-atual"
+              id="cartaAtual"
+            >
+              <strong id="cartaTipo">Nenhuma carta ainda</strong>
+              <p id="cartaTexto"
+                >Caia em casas de Sorte ou Revés para revelar.</p
+              >
+            </div>
+          </div>
+          <div class="historico">
+            <h3>Linha do tempo</h3>
+            <ul id="historico"></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <script>
+      const personagens = [
+        {
+          id: 'Orange',
+          nome: 'Orange',
+          apelido: 'Oren',
+          sigla: 'OR',
+          cor: '#ff8a00',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/3/3c/Orensvg.svg/revision/latest/scale-to-width-down/131?cb=20241105133516',
+        },
+        {
+          id: 'Red',
+          nome: 'Red',
+          apelido: 'Raddy',
+          sigla: 'RD',
+          cor: '#ff4b4b',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/a/a2/Raddysvg.svg/revision/latest/scale-to-width-down/126?cb=20241105133516',
+        },
+        {
+          id: 'Silver',
+          nome: 'Silver',
+          apelido: 'Clukr',
+          sigla: 'SI',
+          cor: '#d4d9e7',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/b/bb/Clukersvg.svg/revision/latest/scale-to-width-down/127?cb=20241215194356',
+        },
+        {
+          id: 'Fun_Bot',
+          nome: 'Fun Bot',
+          apelido: 'Fun Bot',
+          sigla: 'FB',
+          cor: '#ffe066',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/0/04/Funbotsvg.svg/revision/latest/scale-to-width-down/103?cb=20241105133510',
+        },
+        {
+          id: 'Green',
+          nome: 'Green',
+          apelido: 'Vineria',
+          sigla: 'GR',
+          cor: '#35d894',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/0/0e/Vinerasvg.svg/revision/latest/scale-to-width-down/102?cb=20241105133511',
+        },
+        {
+          id: 'Sky_Blue',
+          nome: 'Sky Blue',
+          apelido: 'Sky',
+          sigla: 'SK',
+          cor: '#7ec8ff',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/8/8b/Sky.svg/revision/latest/scale-to-width-down/103?cb=20241128191459',
+        },
+        {
+          id: 'Purple',
+          nome: 'Purple',
+          apelido: 'Durple',
+          sigla: 'PR',
+          cor: '#b384ff',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/f/ff/Durplesvg.svg/revision/latest/scale-to-width-down/101?cb=20241105133512',
+        },
+        {
+          id: 'Yellow',
+          nome: 'Yellow',
+          apelido: 'Simon',
+          sigla: 'YL',
+          cor: '#ffeb52',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/6/62/Simonsvg.svg/revision/latest/scale-to-width-down/130?cb=20241105133512',
+        },
+        {
+          id: 'Pink',
+          nome: 'Pink',
+          apelido: 'Pinki',
+          sigla: 'PK',
+          cor: '#ff7ab8',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/5/54/Pinki.svg/revision/latest/scale-to-width-down/84?cb=20241128060048',
+        },
+        {
+          id: 'Blue',
+          nome: 'Blue',
+          apelido: 'Jevin',
+          sigla: 'BL',
+          cor: '#4a90ff',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/7/70/Jevinsvg.svg/revision/latest/scale-to-width-down/109?cb=20241105133513',
+        },
+        {
+          id: 'Black',
+          nome: 'Black',
+          apelido: 'Black Sprunki',
+          sigla: 'BK',
+          cor: '#23232e',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/d/d5/Blacksvg.svg/revision/latest/scale-to-width-down/103?cb=20241105133516',
+        },
+        {
+          id: 'Gold',
+          nome: 'Gold',
+          apelido: 'Garnold',
+          sigla: 'GD',
+          cor: '#f6c350',
+          imagem:
+            'https://static.wikia.nocookie.net/incredibox-sprunki/images/0/0c/Garnoldsvg.svg/revision/latest/scale-to-width-down/110?cb=20241105133511',
+        },
+      ];
+
+      const casas = [
+        {
+          titulo: 'Spawn Beat',
+          descricao: 'Ponto inicial.',
+          tipo: 'inicio',
+          x: 8,
+          y: 90,
+        },
+        {
+          titulo: 'Sprunk Stage',
+          descricao: 'Luzes verdes confundem.',
+          tipo: 'tema',
+          x: 18,
+          y: 78,
+        },
+        {
+          titulo: 'Bass Tunnel',
+          descricao: 'Pulso empurra.',
+          tipo: 'tema',
+          x: 30,
+          y: 70,
+        },
+        {
+          titulo: 'Caixa de Sorte',
+          descricao: 'Pegue carta neon.',
+          tipo: 'sorte',
+          x: 24,
+          y: 58,
+        },
+        {
+          titulo: 'Glitch Lane',
+          descricao: 'O chão some!',
+          tipo: 'reves',
+          x: 16,
+          y: 46,
+        },
+        {
+          titulo: 'Mix Lab',
+          descricao: 'Ajuste tranquilo.',
+          tipo: 'tema',
+          x: 22,
+          y: 36,
+        },
+        {
+          titulo: 'Beat Street',
+          descricao: 'Desfile sprunki.',
+          tipo: 'tema',
+          x: 34,
+          y: 30,
+        },
+        {
+          titulo: 'Cartas Sprunk',
+          descricao: 'Evento aleatório.',
+          tipo: 'sorte',
+          x: 44,
+          y: 24,
+        },
+        {
+          titulo: 'Backstage Neblina',
+          descricao: 'Fumaça atrasa.',
+          tipo: 'reves',
+          x: 56,
+          y: 22,
+        },
+        {
+          titulo: 'Groove Plaza',
+          descricao: 'Respire e siga.',
+          tipo: 'normal',
+          x: 68,
+          y: 28,
+        },
+        {
+          titulo: 'Solo Legend',
+          descricao: 'Solo lendário.',
+          tipo: 'tema',
+          x: 78,
+          y: 24,
+        },
+        {
+          titulo: 'Neon Falls',
+          descricao: 'Descida brilhante.',
+          tipo: 'tema',
+          x: 86,
+          y: 34,
+        },
+        {
+          titulo: 'Card Sorte',
+          descricao: 'Fortuna retorna.',
+          tipo: 'sorte',
+          x: 80,
+          y: 44,
+        },
+        {
+          titulo: 'Batalha Sprunk',
+          descricao: 'Quem vacila recua.',
+          tipo: 'reves',
+          x: 70,
+          y: 50,
+        },
+        {
+          titulo: 'Lounge Vapor',
+          descricao: 'Descanso flutuante.',
+          tipo: 'tema',
+          x: 60,
+          y: 46,
+        },
+        {
+          titulo: 'Card Revés',
+          descricao: 'Palco apagou.',
+          tipo: 'reves',
+          x: 52,
+          y: 52,
+        },
+        {
+          titulo: 'Holo-Bridge',
+          descricao: 'Ponte translúcida.',
+          tipo: 'tema',
+          x: 46,
+          y: 62,
+        },
+        {
+          titulo: 'Sprunk Loop',
+          descricao: 'Velocidade neon.',
+          tipo: 'sorte',
+          x: 54,
+          y: 70,
+        },
+        {
+          titulo: 'Eco Perdido',
+          descricao: 'Voltar pra achar o beat.',
+          tipo: 'reves',
+          x: 66,
+          y: 74,
+        },
+        {
+          titulo: 'Neon Market',
+          descricao: 'Troque samples.',
+          tipo: 'normal',
+          x: 78,
+          y: 80,
+        },
+        {
+          titulo: 'VR Session',
+          descricao: 'Treino surpresa.',
+          tipo: 'sorte',
+          x: 88,
+          y: 86,
+        },
+        {
+          titulo: 'Cabos Emaranhados',
+          descricao: 'Desenrolar cansa.',
+          tipo: 'reves',
+          x: 76,
+          y: 90,
+        },
+        {
+          titulo: 'Back to Beat',
+          descricao: 'Casa neutra.',
+          tipo: 'normal',
+          x: 62,
+          y: 88,
+        },
+        {
+          titulo: 'Final Mix',
+          descricao: 'Último ajuste.',
+          tipo: 'tema',
+          x: 48,
+          y: 84,
+        },
+        {
+          titulo: 'Grande Palco',
+          descricao: 'Chegada explosiva!',
+          tipo: 'meta',
+          x: 34,
+          y: 86,
+        },
+      ];
+
+      const cartasSorte = [
+        {
+          texto: 'Drop perfeito! Avance 3 casas.',
+          efeito: (jogador) => moverExtra(jogador, 3),
+        },
+        {
+          texto: 'Chuva de Sprunk. Avance 2 ou faça o rival voltar 1.',
+          efeito: (jogador) => escolhaJogador(jogador, 2, 1),
+        },
+        {
+          texto: 'Loop impecável: jogue novamente após mover.',
+          efeito: (jogador) => (jogador.bonusTurno = true),
+        },
+        {
+          texto: 'Coro do público garante um escudo.',
+          efeito: (jogador) => (jogador.escudo = true),
+        },
+      ];
+
+      const cartasReves = [
+        {
+          texto: 'Cabo desconectado! Volte 2 casas.',
+          efeito: (jogador) => moverExtra(jogador, -2),
+        },
+        {
+          texto: 'Escorregou em Sprunk derramado. Perde a próxima vez.',
+          efeito: (jogador) => (jogador.pularProxima = true),
+        },
+        {
+          texto: 'Beat travado: volte ao último tema visitado.',
+          efeito: (jogador) => voltarUltimoTema(jogador),
+        },
+        {
+          texto: 'Microfone chiando: o próximo valor vale só metade.',
+          efeito: (jogador) => (jogador.penalidade = true),
+        },
+      ];
+
+      const jogadores = [
+        { nome: 'Jogador 1', personagem: null, cor: '#fff', posicao: 0 },
+        { nome: 'Jogador 2', personagem: null, cor: '#fff', posicao: 0 },
+      ];
+
+      const escolhas = [null, null];
+      let jogoIniciado = false;
+      let jogadorAtual = 0;
+      let animando = false;
+
+      const seletores = [
+        document.getElementById('lista1'),
+        document.getElementById('lista2'),
+      ];
+      const previews = [
+        document.getElementById('preview1'),
+        document.getElementById('preview2'),
+      ];
+      const setupSection = document.querySelector('.setup');
+      const painelPrincipal = document.querySelector('.painel-principal');
+      const iniciarBtn = document.getElementById('iniciarJogo');
+      const rolarBtn = document.getElementById('rolarDados');
+      const valorDado = document.getElementById('valorDado');
+      const statusTurno = document.getElementById('statusTurno');
+      const mensagem = document.getElementById('mensagem');
+      const historico = document.getElementById('historico');
+      const cartaPainel = document.getElementById('cartaAtual');
+      const cartaTipo = document.getElementById('cartaTipo');
+      const cartaTexto = document.getElementById('cartaTexto');
+
+      function montarSeletores() {
+        seletores.forEach((container, idx) => {
+          container.innerHTML = '';
+          personagens.forEach((personagem) => {
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'personagem-card';
+            card.dataset.personagem = personagem.id;
+            card.innerHTML = `
+              <img src="${personagem.imagem}" alt="${personagem.nome}" />
+              <strong>${personagem.nome}</strong>
+              <small>${personagem.apelido}</small>
+            `;
+            card.addEventListener('click', () =>
+              escolherPersonagem(idx, personagem)
+            );
+            container.appendChild(card);
+          });
+        });
+      }
+
+      function escolherPersonagem(idx, personagem) {
+        if (jogoIniciado) return;
+        const rivalIdx = idx === 0 ? 1 : 0;
+        if (escolhas[rivalIdx]?.id === personagem.id) {
+          mensagem.textContent = `${personagem.nome} já foi escolhido pelo rival.`;
+          return;
+        }
+        escolhas[idx] = personagem;
+        atualizarSelecaoVisual();
+        atualizarPreview(idx);
+        validarSelecao();
+      }
+
+      function atualizarSelecaoVisual() {
+        seletores.forEach((container, idx) => {
+          const rivalIdx = idx === 0 ? 1 : 0;
+          container.querySelectorAll('.personagem-card').forEach((card) => {
+            const id = card.dataset.personagem;
+            card.classList.toggle('selected', escolhas[idx]?.id === id);
+            const bloqueado = escolhas[rivalIdx]?.id === id;
+            card.classList.toggle('bloqueado', Boolean(bloqueado));
+            card.disabled = Boolean(bloqueado);
+          });
+        });
+      }
+
+      function atualizarPreview(idx) {
+        const preview = previews[idx];
+        const escolha = escolhas[idx];
+        if (!escolha) {
+          preview.innerHTML = '<span>Selecione um personagem.</span>';
+          preview.style.borderColor = 'rgba(0,0,0,0.1)';
+          return;
+        }
+        preview.innerHTML = `
+          <img src="${escolha.imagem}" alt="${escolha.nome}" />
+          <div>
+            <strong>${escolha.nome}</strong>
+            <small>${escolha.apelido}</small>
+          </div>
+        `;
+        preview.style.borderColor = escolha.cor;
+      }
+
+      function validarSelecao() {
+        const ambosEscolhidos = escolhas.every(Boolean);
+        iniciarBtn.disabled = !ambosEscolhidos;
+        if (ambosEscolhidos) {
+          mensagem.textContent =
+            'Pronto! Clique em "Iniciar Partida" para começar.';
+        }
+      }
+
+      iniciarBtn.addEventListener('click', () => {
+        if (!escolhas.every(Boolean)) return;
+        jogadores.forEach((jogador, idx) => {
+          const personagem = escolhas[idx];
+          jogador.personagem = personagem;
+          jogador.cor = personagem.cor;
+          jogador.posicao = 0;
+          jogador.escudo = false;
+          jogador.pularProxima = false;
+          jogador.bonusTurno = false;
+          jogador.penalidade = false;
+        });
+        jogoIniciado = true;
+        jogadorAtual = 0;
+        iniciarBtn.disabled = true;
+        setupSection.classList.add('hidden');
+        painelPrincipal.classList.remove('hidden');
+        mensagem.textContent =
+          'Partida iniciada! Lance os dados para andar na trilha.';
+        historico.innerHTML = '';
+        valorDado.textContent = '-';
+        resetCartaPainel();
+        rolarBtn.disabled = false;
+        atualizarStatus();
+        atualizarTabuleiro();
+        registrar(
+          `${jogadores[0].personagem.nome} vs ${jogadores[1].personagem.nome} começou!`
+        );
+      });
+
+      rolarBtn.addEventListener('click', async () => {
+        if (!jogoIniciado || animando) return;
+        const jogador = jogadores[jogadorAtual];
+        if (jogador.pularProxima) {
+          registrar(`${jogador.personagem.nome} perde a vez por revés.`);
+          jogador.pularProxima = false;
+          avancarTurno();
+          return;
+        }
+
+        animando = true;
+        rolarBtn.disabled = true;
+        const valor = await animarDado();
+        const passos = jogador.penalidade
+          ? Math.max(1, Math.floor(valor / 2))
+          : valor;
+        jogador.penalidade = false;
+        valorDado.textContent = passos;
+        registrar(
+          `${jogador.personagem.nome} tirou ${valor} e avança ${passos}.`
+        );
+        await moverJogador(jogador, passos);
+        verificarCasa(jogador);
+
+        if (jogador.posicao >= casas.length - 1) {
+          mensagem.textContent = `${jogador.personagem.nome} chegou ao Grande Palco!`;
+          registrar(`${jogador.personagem.nome} venceu a corrida Sprunk!`);
+          rolarBtn.disabled = true;
+          animando = false;
+          return;
+        }
+
+        if (jogador.bonusTurno) {
+          registrar(`${jogador.personagem.nome} ganhou um turno extra.`);
+          jogador.bonusTurno = false;
+          animando = false;
+          rolarBtn.disabled = false;
+          atualizarStatus('— turno bônus!');
+          return;
+        }
+
+        animando = false;
+        avancarTurno();
+      });
+
+      function resetCartaPainel() {
+        cartaPainel.className = 'carta-atual';
+        cartaTipo.textContent = 'Nenhuma carta ainda';
+        cartaTexto.textContent =
+          'Caia em casas de Sorte ou Revés para revelar.';
+      }
+
+      async function animarDado() {
+        const roll = () => Math.floor(Math.random() * 6) + 1;
+        for (let i = 0; i < 10; i++) {
+          valorDado.textContent = roll();
+          await esperar(90);
+        }
+        return roll();
+      }
+
+      function esperar(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function moverJogador(jogador, passos) {
+        const destino = Math.min(jogador.posicao + passos, casas.length - 1);
+        while (jogador.posicao < destino) {
+          jogador.posicao++;
+          mensagem.textContent = `${jogador.personagem.nome} alcançou ${
+            casas[jogador.posicao].titulo
+          }.`;
+          atualizarTabuleiro();
+          await esperar(240);
+        }
+      }
+
+      function moverExtra(jogador, delta) {
+        jogador.posicao = Math.min(
+          Math.max(jogador.posicao + delta, 0),
+          casas.length - 1
+        );
+        atualizarTabuleiro();
+      }
+
+      function voltarUltimoTema(jogador) {
+        if (jogador.escudo) {
+          registrar('Escudo ativado! Nenhum revés aplicado.');
+          jogador.escudo = false;
+          return;
+        }
+        for (let i = jogador.posicao; i >= 0; i--) {
+          if (casas[i].tipo === 'tema') {
+            jogador.posicao = i;
+            atualizarTabuleiro();
+            return;
+          }
+        }
+        jogador.posicao = 0;
+        atualizarTabuleiro();
+      }
+
+      function escolhaJogador(jogador, bonus, penalidade) {
+        const resposta = confirm(
+          `${jogador.personagem.nome}: Avançar ${bonus} casas? (Cancelar = rival recua ${penalidade})`
+        );
+        if (resposta) {
+          moverExtra(jogador, bonus);
+        } else {
+          const rival = jogadores[jogadorAtual === 0 ? 1 : 0];
+          moverExtra(rival, -penalidade);
+          registrar(`${rival.personagem.nome} recuou ${penalidade}.`);
+        }
+      }
+
+      function verificarCasa(jogador) {
+        const casaAtual = casas[jogador.posicao];
+        mensagem.textContent = `${jogador.personagem.nome} está em ${casaAtual.titulo}.`;
+        if (casaAtual.tipo === 'sorte') {
+          aplicarCarta(jogador, cartasSorte, 'Sorte');
+        } else if (casaAtual.tipo === 'reves') {
+          if (jogador.escudo) {
+            registrar('Escudo protegeu do revés.');
+            jogador.escudo = false;
+            return;
+          }
+          aplicarCarta(jogador, cartasReves, 'Revés');
+        }
+      }
+
+      function aplicarCarta(jogador, baralho, tipo) {
+        const carta = baralho[Math.floor(Math.random() * baralho.length)];
+        cartaPainel.className = 'carta-atual';
+        cartaPainel.classList.add(
+          tipo === 'Sorte' ? 'sorte-card' : 'reves-card'
+        );
+        cartaTipo.textContent = `${tipo} de ${jogador.personagem.nome}`;
+        cartaTexto.textContent = carta.texto;
+        registrar(`${tipo} para ${jogador.personagem.nome}: ${carta.texto}`);
+        carta.efeito(jogador);
+        atualizarTabuleiro();
+      }
+
+      function avancarTurno() {
+        jogadorAtual = jogadorAtual === 0 ? 1 : 0;
+        atualizarStatus();
+        rolarBtn.disabled = false;
+      }
+
+      function atualizarStatus(extra = '') {
+        const jogador = jogadores[jogadorAtual];
+        statusTurno.textContent = `Vez de ${
+          jogador.personagem?.nome || '...'
+        } ${extra}`;
+      }
+
+      function registrar(texto) {
+        const li = document.createElement('li');
+        li.textContent = texto;
+        historico.prepend(li);
+        while (historico.childElementCount > 12) {
+          historico.lastChild.remove();
+        }
+      }
+
+      function atualizarTabuleiro() {
+        document
+          .querySelectorAll('.piao-area')
+          .forEach((area) => (area.innerHTML = ''));
+        jogadores.forEach((jogador) => {
+          if (!jogador.personagem) return;
+          const casaEl = document.querySelector(
+            `.casa[data-ordem="${jogador.posicao}"] .piao-area`
+          );
+          if (!casaEl) return;
+          const token = document.createElement('div');
+          token.className = 'piao';
+          const img = document.createElement('img');
+          img.src = jogador.personagem.imagem;
+          img.alt = jogador.personagem.nome;
+          token.appendChild(img);
+          casaEl.appendChild(token);
+        });
+      }
+
+      function montarTabuleiro() {
+        const tabuleiro = document.getElementById('tabuleiro');
+        tabuleiro.innerHTML = '';
+        casas.forEach((casa, indice) => {
+          const div = document.createElement('div');
+          div.className = `casa ${casa.tipo || ''}`;
+          div.dataset.ordem = indice;
+          div.style.left = casa.x + '%';
+          div.style.top = casa.y + '%';
+          const numero = document.createElement('span');
+          numero.className = 'numero';
+          numero.textContent = indice + 1;
+          const titulo = document.createElement('strong');
+          titulo.textContent = casa.titulo;
+          const desc = document.createElement('small');
+          desc.textContent = casa.descricao;
+          const piaoArea = document.createElement('div');
+          piaoArea.className = 'piao-area';
+          div.append(numero, titulo, desc, piaoArea);
+          tabuleiro.appendChild(div);
+        });
+        desenharRota();
+      }
+
+      function desenharRota() {
+        const rota = document.getElementById('rota');
+        rota.innerHTML = '';
+        const track = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'path'
+        );
+        track.setAttribute(
+          'd',
+          'M8 90 C 12 78 28 76 34 66 C 40 56 30 50 24 44 C 18 38 20 30 28 28 C 44 24 60 20 74 26 C 84 30 84 44 72 50 C 60 56 46 58 42 64 C 38 70 46 78 56 80 C 68 84 82 86 90 90'
+        );
+        track.setAttribute('class', 'track');
+        const border = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'path'
+        );
+        border.setAttribute('d', track.getAttribute('d'));
+        border.setAttribute('class', 'border');
+        rota.append(track, border);
+      }
+
+      montarSeletores();
+      montarTabuleiro();
+      atualizarTabuleiro();
+    </script>
+  </body>
+</html>
