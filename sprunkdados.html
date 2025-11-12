@@ -40,7 +40,7 @@
       .tag-percurso {
         text-align: center;
         margin: 6px auto;
-        max-width: 900px;
+        max-width: 90%;
         color: #4a2c75;
       }
 
@@ -50,14 +50,14 @@
 
       .setup {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 60px;
         background: rgba(255, 255, 255, 0.9);
         padding: clamp(12px, 2vw, 20px);
         border-radius: 22px;
         border: 1px solid rgba(255, 255, 255, 0.7);
         box-shadow: 0 16px 40px rgba(114, 76, 213, 0.16);
-        max-width: 1400px;
+        max-width: 90%;
         margin: 0 auto 20px;
       }
 
@@ -178,7 +178,7 @@
       }
 
       .painel-principal {
-        max-width: 1400px;
+        max-width: 90%;
         margin: 0 auto;
         display: grid;
         gap: 18px;
@@ -220,7 +220,7 @@
 
       .game-area {
         display: grid;
-        grid-template-columns: minmax(520px, 1fr) minmax(220px, 260px);
+        grid-template-columns: minmax(220px, 280px) minmax(520px, 1fr);
         gap: 14px;
       }
 
@@ -235,7 +235,7 @@
       .mapa-real {
         position: relative;
         width: 100%;
-        aspect-ratio: 5 / 3;
+        aspect-ratio: 4 / 3;
         border-radius: 26px;
         background: radial-gradient(
           circle at 20% 25%,
@@ -243,91 +243,462 @@
           rgba(255, 255, 255, 0.35)
         );
         overflow: hidden;
-      }
-
-      #rota {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      #rota path.track {
-        fill: none;
-        stroke: rgba(255, 255, 255, 0.85);
-        stroke-width: 14;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.4));
-      }
-
-      #rota path.border {
-        fill: none;
-        stroke: #f4a913;
-        stroke-width: 6;
-        stroke-dasharray: 16 8;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        vector-effect: non-scaling-stroke;
+        padding: 20px 20px 40px 20px;
       }
 
       #tabuleiro {
-        position: absolute;
-        inset: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        align-content: start;
+      }
+
+      /* Posicionamento em zigue-zague */
+      /* Linha 1: 1-5 (esquerda para direita) */
+      .casa:nth-child(1) {
+        grid-row: 1;
+        grid-column: 1;
+      }
+      .casa:nth-child(2) {
+        grid-row: 1;
+        grid-column: 2;
+      }
+      .casa:nth-child(3) {
+        grid-row: 1;
+        grid-column: 3;
+      }
+      .casa:nth-child(4) {
+        grid-row: 1;
+        grid-column: 4;
+      }
+      .casa:nth-child(5) {
+        grid-row: 1;
+        grid-column: 5;
+      }
+
+      /* Linha 2: 6-10 (direita para esquerda) */
+      .casa:nth-child(6) {
+        grid-row: 2;
+        grid-column: 5;
+      }
+      .casa:nth-child(7) {
+        grid-row: 2;
+        grid-column: 4;
+      }
+      .casa:nth-child(8) {
+        grid-row: 2;
+        grid-column: 3;
+      }
+      .casa:nth-child(9) {
+        grid-row: 2;
+        grid-column: 2;
+      }
+      .casa:nth-child(10) {
+        grid-row: 2;
+        grid-column: 1;
+      }
+
+      /* Linha 3: 11-15 (esquerda para direita) */
+      .casa:nth-child(11) {
+        grid-row: 3;
+        grid-column: 1;
+      }
+      .casa:nth-child(12) {
+        grid-row: 3;
+        grid-column: 2;
+      }
+      .casa:nth-child(13) {
+        grid-row: 3;
+        grid-column: 3;
+      }
+      .casa:nth-child(14) {
+        grid-row: 3;
+        grid-column: 4;
+      }
+      .casa:nth-child(15) {
+        grid-row: 3;
+        grid-column: 5;
+      }
+
+      /* Linha 4: 16-20 (direita para esquerda) */
+      .casa:nth-child(16) {
+        grid-row: 4;
+        grid-column: 5;
+      }
+      .casa:nth-child(17) {
+        grid-row: 4;
+        grid-column: 4;
+      }
+      .casa:nth-child(18) {
+        grid-row: 4;
+        grid-column: 3;
+      }
+      .casa:nth-child(19) {
+        grid-row: 4;
+        grid-column: 2;
+      }
+      .casa:nth-child(20) {
+        grid-row: 4;
+        grid-column: 1;
+      }
+
+      /* Linha 5: 21-25 (esquerda para direita) */
+      .casa:nth-child(21) {
+        grid-row: 5;
+        grid-column: 1;
+      }
+      .casa:nth-child(22) {
+        grid-row: 5;
+        grid-column: 2;
+      }
+      .casa:nth-child(23) {
+        grid-row: 5;
+        grid-column: 3;
+      }
+      .casa:nth-child(24) {
+        grid-row: 5;
+        grid-column: 4;
+      }
+      .casa:nth-child(25) {
+        grid-row: 5;
+        grid-column: 5;
+      }
+
+      /* Linha 6: 26-30 (direita para esquerda) */
+      .casa:nth-child(26) {
+        grid-row: 6;
+        grid-column: 5;
+      }
+      .casa:nth-child(27) {
+        grid-row: 6;
+        grid-column: 4;
+      }
+      .casa:nth-child(28) {
+        grid-row: 6;
+        grid-column: 3;
+      }
+      .casa:nth-child(29) {
+        grid-row: 6;
+        grid-column: 2;
+      }
+      .casa:nth-child(30) {
+        grid-row: 6;
+        grid-column: 1;
+      }
+
+      /* Linha 7: 31-35 (esquerda para direita) */
+      .casa:nth-child(31) {
+        grid-row: 7;
+        grid-column: 1;
+      }
+      .casa:nth-child(32) {
+        grid-row: 7;
+        grid-column: 2;
+      }
+      .casa:nth-child(33) {
+        grid-row: 7;
+        grid-column: 3;
+      }
+      .casa:nth-child(34) {
+        grid-row: 7;
+        grid-column: 4;
+      }
+      .casa:nth-child(35) {
+        grid-row: 7;
+        grid-column: 5;
+      }
+
+      /* Linha 8: 36-40 (direita para esquerda) */
+      .casa:nth-child(36) {
+        grid-row: 8;
+        grid-column: 5;
+      }
+      .casa:nth-child(37) {
+        grid-row: 8;
+        grid-column: 4;
+      }
+      .casa:nth-child(38) {
+        grid-row: 8;
+        grid-column: 3;
+      }
+      .casa:nth-child(39) {
+        grid-row: 8;
+        grid-column: 2;
+      }
+      .casa:nth-child(40) {
+        grid-row: 8;
+        grid-column: 1;
       }
 
       .casa {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        min-width: 90px;
-        padding: 8px 10px 10px;
+        position: relative;
+        padding: 10px;
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.94);
-        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.96);
+        border: 4px solid rgba(255, 200, 100, 0.7);
         font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
+      }
+
+      .casa:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Borda com cor do jogador - um jogador */
+      .casa.jogador-presente-1 {
+        border-width: 5px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      /* Borda dividida - dois jogadores */
+      .casa.jogador-presente-2 {
+        border-width: 5px;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      /* Cria efeito de divisão diagonal quando há dois jogadores */
+      .casa.jogador-presente-2::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: 50%;
+        bottom: 50%;
+        border-radius: 16px 0 0 0;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        50% {
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.3);
+        }
       }
 
       .casa.tema {
-        background: rgba(153, 129, 252, 0.95);
+        background: linear-gradient(
+          135deg,
+          rgba(153, 129, 252, 0.98),
+          rgba(183, 129, 252, 0.95)
+        );
         color: #fff;
+        border-color: rgba(123, 93, 255, 0.9);
       }
 
       .casa.sorte {
-        background: rgba(96, 245, 197, 0.95);
+        background: linear-gradient(
+          135deg,
+          rgba(96, 245, 197, 0.98),
+          rgba(51, 223, 176, 0.95)
+        );
         color: #063932;
+        border-color: rgba(51, 223, 176, 0.9);
       }
 
       .casa.reves {
-        background: rgba(255, 157, 180, 0.95);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 157, 180, 0.98),
+          rgba(255, 123, 176, 0.95)
+        );
+        border-color: rgba(255, 123, 176, 0.9);
+      }
+
+      .casa.inicio {
+        background: linear-gradient(
+          135deg,
+          rgba(200, 200, 255, 0.98),
+          rgba(170, 170, 255, 0.95)
+        );
+        border-color: rgba(123, 93, 255, 0.9);
+        font-weight: 600;
+      }
+
+      .casa.normal {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(240, 240, 255, 0.95)
+        );
+        border-color: rgba(180, 180, 200, 0.8);
       }
 
       .casa.meta {
-        background: linear-gradient(135deg, var(--amarelo), var(--laranja));
+        background: linear-gradient(135deg, #ffe766, #ffb347);
         color: #422608;
-        font-weight: 600;
+        font-weight: 700;
+        border-color: rgba(255, 180, 0, 1);
+        box-shadow: 0 6px 20px rgba(255, 180, 0, 0.5);
       }
 
       .casa .numero {
         position: absolute;
-        top: 6px;
-        right: 8px;
+        top: 4px;
+        right: 6px;
+        font-size: 11px;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.5);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 3px 7px;
+        border-radius: 8px;
+        min-width: 24px;
+        text-align: center;
+      }
+
+      .casa strong {
+        font-size: 13px;
+        margin-bottom: 3px;
+        text-align: center;
+      }
+
+      .casa small {
         font-size: 10px;
-        color: rgba(0, 0, 0, 0.45);
+        opacity: 0.9;
+        text-align: center;
+      }
+
+      /* Adiciona setas direcionais para indicar o caminho em zigue-zague */
+      .casa::after {
+        content: '→';
+        position: absolute;
+        bottom: 4px;
+        right: 8px;
+        font-size: 18px;
+        opacity: 0.3;
+        font-weight: bold;
+      }
+
+      /* Linha 1 (casas 1-5): direita → */
+      .casa:nth-child(1)::after,
+      .casa:nth-child(2)::after,
+      .casa:nth-child(3)::after,
+      .casa:nth-child(4)::after {
+        content: '→';
+      }
+
+      /* Final da linha 1: desce ↓ */
+      .casa:nth-child(5)::after {
+        content: '↓';
+      }
+
+      /* Linha 2 (casas 6-10): esquerda ← */
+      .casa:nth-child(6)::after,
+      .casa:nth-child(7)::after,
+      .casa:nth-child(8)::after,
+      .casa:nth-child(9)::after {
+        content: '←';
+      }
+
+      /* Final da linha 2: desce ↓ */
+      .casa:nth-child(10)::after {
+        content: '↓';
+      }
+
+      /* Linha 3 (casas 11-15): direita → */
+      .casa:nth-child(11)::after,
+      .casa:nth-child(12)::after,
+      .casa:nth-child(13)::after,
+      .casa:nth-child(14)::after {
+        content: '→';
+      }
+
+      /* Final da linha 3: desce ↓ */
+      .casa:nth-child(15)::after {
+        content: '↓';
+      }
+
+      /* Linha 4 (casas 16-20): esquerda ← */
+      .casa:nth-child(16)::after,
+      .casa:nth-child(17)::after,
+      .casa:nth-child(18)::after,
+      .casa:nth-child(19)::after {
+        content: '←';
+      }
+
+      /* Final da linha 4: desce ↓ */
+      .casa:nth-child(20)::after {
+        content: '↓';
+      }
+
+      /* Linha 5 (casas 21-25): direita → */
+      .casa:nth-child(21)::after,
+      .casa:nth-child(22)::after,
+      .casa:nth-child(23)::after,
+      .casa:nth-child(24)::after {
+        content: '→';
+      }
+
+      /* Final da linha 5: desce ↓ */
+      .casa:nth-child(25)::after {
+        content: '↓';
+      }
+
+      /* Linha 6 (casas 26-30): esquerda ← */
+      .casa:nth-child(26)::after,
+      .casa:nth-child(27)::after,
+      .casa:nth-child(28)::after,
+      .casa:nth-child(29)::after {
+        content: '←';
+      }
+
+      /* Final da linha 6: desce ↓ */
+      .casa:nth-child(30)::after {
+        content: '↓';
+      }
+
+      /* Linha 7 (casas 31-35): direita → */
+      .casa:nth-child(31)::after,
+      .casa:nth-child(32)::after,
+      .casa:nth-child(33)::after,
+      .casa:nth-child(34)::after {
+        content: '→';
+      }
+
+      /* Final da linha 7: desce ↓ */
+      .casa:nth-child(35)::after {
+        content: '↓';
+      }
+
+      /* Linha 8 (casas 36-40): esquerda ← */
+      .casa:nth-child(36)::after,
+      .casa:nth-child(37)::after,
+      .casa:nth-child(38)::after,
+      .casa:nth-child(39)::after {
+        content: '←';
+      }
+
+      .casa.meta::after {
+        content: '🎯';
+        opacity: 0.5;
       }
 
       .piao-area {
-        margin-top: 4px;
+        margin-top: 6px;
         display: flex;
-        gap: 4px;
+        gap: 6px;
         flex-wrap: wrap;
+        justify-content: center;
       }
 
       .piao {
-        width: 30px;
-        height: 30px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        border: 2px solid rgba(255, 255, 255, 0.85);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+        border: 3px solid rgba(255, 255, 255, 0.95);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
         overflow: hidden;
         background: #fff;
       }
@@ -347,11 +718,59 @@
         margin-bottom: 10px;
       }
 
+      /* Destaque do status do turno */
+      .mensagens #statusTurno {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      .controle-dados {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .controle-dados #rolarDados {
+        width: 100%;
+        padding: 16px;
+        font-size: 18px;
+      }
+
+      .controle-dados .dado-visivel {
+        width: 100px;
+        height: 100px;
+        font-size: 42px;
+      }
+
       .carta-atual {
         border-radius: 16px;
         padding: 12px;
         min-height: 110px;
         border: 1px dashed rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      /* Animação piscante para carta nova */
+      .carta-atual.carta-nova {
+        animation: piscarCarta 1.5s ease-in-out 3;
+      }
+
+      @keyframes piscarCarta {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 0 30px currentColor;
+        }
       }
 
       .carta-atual.sorte-card {
@@ -366,11 +785,45 @@
         color: #5c0f2d;
       }
 
+      .historico {
+        transition: all 0.3s ease;
+      }
+
+      .historico h3 {
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 8px;
+      }
+
+      .historico h3::after {
+        content: ' ▼';
+        font-size: 0.8em;
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+
+      .historico.collapsed h3::after {
+        transform: rotate(-90deg);
+      }
+
       .historico ul {
         max-height: 200px;
         overflow-y: auto;
         margin: 0;
         padding-left: 18px;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+      }
+
+      .historico.collapsed ul {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      /* Destaque do feed com cores da casa */
+      .mensagens#feedJogo {
+        transition: all 0.4s ease;
+        border: 2px solid rgba(255, 255, 255, 0.6);
       }
 
       @media (max-width: 1100px) {
@@ -381,20 +834,30 @@
         .mapa-real {
           aspect-ratio: 4 / 3;
         }
+
+        aside {
+          order: 2;
+        }
+
+        .mapa-wrapper {
+          order: 1;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Corrida Sprunk</h1>
-    <p class="descricao">
-      Conduza dois performers sprunkis por um circuito sinuoso lançando dados,
-      encarando casas temáticas e cartas surpresa até chegar ao Grande Palco.
-    </p>
-    <p class="tag-percurso">
-      Categoria: <strong>Jogo de Percurso</strong> (roll and move)
-    </p>
-
     <section class="setup">
+      <div style="grid-column: 1 / -1; text-align: center">
+        <h1>Corrida Sprunk</h1>
+        <p class="descricao">
+          Conduza dois performers sprunkis por um circuito sinuoso lançando
+          dados, encarando casas temáticas e cartas surpresa até chegar ao
+          Grande Palco.
+        </p>
+        <p class="tag-percurso">
+          Categoria: <strong>Jogo de Percurso</strong> (roll and move)
+        </p>
+      </div>
       <div class="player-config">
         <h2>Jogador 1</h2>
         <p>Escolha um performer Sprunk.</p>
@@ -433,40 +896,37 @@
     </section>
 
     <section class="painel-principal hidden">
-      <div class="acoes">
-        <button
-          id="rolarDados"
-          disabled
-          >🎲 Lançar Dados</button
-        >
-        <div
-          class="dado-visivel"
-          id="valorDado"
-          >-</div
-        >
-        <div
-          class="status-turno"
-          id="statusTurno"
-        >
-          Aguarde a escolha e confirme a partida.
-        </div>
-      </div>
-
       <div class="game-area">
-        <div class="mapa-wrapper">
-          <div class="mapa-real">
-            <svg
-              id="rota"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-            ></svg>
-            <div id="tabuleiro"></div>
-          </div>
-        </div>
         <aside>
+          <div class="controle-dados">
+            <button
+              id="rolarDados"
+              disabled
+              >🎲 Lançar Dados</button
+            >
+            <div
+              class="dado-visivel"
+              id="valorDado"
+              >-</div
+            >
+          </div>
           <div class="mensagens">
+            <h3>Status do Turno</h3>
+            <p
+              id="statusTurno"
+              style="margin: 0; font-size: 14px"
+            >
+              Aguarde a escolha e confirme a partida.
+            </p>
+          </div>
+          <div
+            class="mensagens"
+            id="feedJogo"
+          >
             <h3>Feed de jogo</h3>
-            <p id="mensagem"
+            <p
+              id="mensagem"
+              style="margin: 0"
               >Selecione dois performers para liberar o tabuleiro.</p
             >
           </div>
@@ -482,11 +942,16 @@
               >
             </div>
           </div>
-          <div class="historico">
+          <div class="historico collapsed">
             <h3>Linha do tempo</h3>
             <ul id="historico"></ul>
           </div>
         </aside>
+        <div class="mapa-wrapper">
+          <div class="mapa-real">
+            <div id="tabuleiro"></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -603,181 +1068,53 @@
       ];
 
       const casas = [
-        {
-          titulo: 'Spawn Beat',
-          descricao: 'Ponto inicial.',
-          tipo: 'inicio',
-          x: 8,
-          y: 90,
-        },
-        {
-          titulo: 'Sprunk Stage',
-          descricao: 'Luzes verdes confundem.',
-          tipo: 'tema',
-          x: 18,
-          y: 78,
-        },
-        {
-          titulo: 'Bass Tunnel',
-          descricao: 'Pulso empurra.',
-          tipo: 'tema',
-          x: 30,
-          y: 70,
-        },
-        {
-          titulo: 'Caixa de Sorte',
-          descricao: 'Pegue carta neon.',
-          tipo: 'sorte',
-          x: 24,
-          y: 58,
-        },
-        {
-          titulo: 'Glitch Lane',
-          descricao: 'O chão some!',
-          tipo: 'reves',
-          x: 16,
-          y: 46,
-        },
-        {
-          titulo: 'Mix Lab',
-          descricao: 'Ajuste tranquilo.',
-          tipo: 'tema',
-          x: 22,
-          y: 36,
-        },
-        {
-          titulo: 'Beat Street',
-          descricao: 'Desfile sprunki.',
-          tipo: 'tema',
-          x: 34,
-          y: 30,
-        },
-        {
-          titulo: 'Cartas Sprunk',
-          descricao: 'Evento aleatório.',
-          tipo: 'sorte',
-          x: 44,
-          y: 24,
-        },
-        {
-          titulo: 'Backstage Neblina',
-          descricao: 'Fumaça atrasa.',
-          tipo: 'reves',
-          x: 56,
-          y: 22,
-        },
-        {
-          titulo: 'Groove Plaza',
-          descricao: 'Respire e siga.',
-          tipo: 'normal',
-          x: 68,
-          y: 28,
-        },
-        {
-          titulo: 'Solo Legend',
-          descricao: 'Solo lendário.',
-          tipo: 'tema',
-          x: 78,
-          y: 24,
-        },
-        {
-          titulo: 'Neon Falls',
-          descricao: 'Descida brilhante.',
-          tipo: 'tema',
-          x: 86,
-          y: 34,
-        },
-        {
-          titulo: 'Card Sorte',
-          descricao: 'Fortuna retorna.',
-          tipo: 'sorte',
-          x: 80,
-          y: 44,
-        },
-        {
-          titulo: 'Batalha Sprunk',
-          descricao: 'Quem vacila recua.',
-          tipo: 'reves',
-          x: 70,
-          y: 50,
-        },
-        {
-          titulo: 'Lounge Vapor',
-          descricao: 'Descanso flutuante.',
-          tipo: 'tema',
-          x: 60,
-          y: 46,
-        },
-        {
-          titulo: 'Card Revés',
-          descricao: 'Palco apagou.',
-          tipo: 'reves',
-          x: 52,
-          y: 52,
-        },
-        {
-          titulo: 'Holo-Bridge',
-          descricao: 'Ponte translúcida.',
-          tipo: 'tema',
-          x: 46,
-          y: 62,
-        },
-        {
-          titulo: 'Sprunk Loop',
-          descricao: 'Velocidade neon.',
-          tipo: 'sorte',
-          x: 54,
-          y: 70,
-        },
-        {
-          titulo: 'Eco Perdido',
-          descricao: 'Voltar pra achar o beat.',
-          tipo: 'reves',
-          x: 66,
-          y: 74,
-        },
-        {
-          titulo: 'Neon Market',
-          descricao: 'Troque samples.',
-          tipo: 'normal',
-          x: 78,
-          y: 80,
-        },
-        {
-          titulo: 'VR Session',
-          descricao: 'Treino surpresa.',
-          tipo: 'sorte',
-          x: 88,
-          y: 86,
-        },
-        {
-          titulo: 'Cabos Emaranhados',
-          descricao: 'Desenrolar cansa.',
-          tipo: 'reves',
-          x: 76,
-          y: 90,
-        },
-        {
-          titulo: 'Back to Beat',
-          descricao: 'Casa neutra.',
-          tipo: 'normal',
-          x: 62,
-          y: 88,
-        },
-        {
-          titulo: 'Final Mix',
-          descricao: 'Último ajuste.',
-          tipo: 'tema',
-          x: 48,
-          y: 84,
-        },
-        {
-          titulo: 'Grande Palco',
-          descricao: 'Chegada explosiva!',
-          tipo: 'meta',
-          x: 34,
-          y: 86,
-        },
+        { titulo: 'Spawn', descricao: 'Início', tipo: 'inicio' },
+        { titulo: 'Sprunk Stage', descricao: 'Luzes verdes', tipo: 'tema' },
+        { titulo: 'Bass Tunnel', descricao: 'Pulso empurra', tipo: 'tema' },
+        { titulo: 'Sorte Neon', descricao: 'Carta sorte', tipo: 'sorte' },
+        { titulo: 'Glitch Lane', descricao: 'Chão some!', tipo: 'reves' },
+
+        { titulo: 'Mix Lab', descricao: 'Ajuste suave', tipo: 'tema' },
+        { titulo: 'Beat Street', descricao: 'Desfile', tipo: 'normal' },
+        { titulo: 'Cartas Sprunk', descricao: 'Aleatório', tipo: 'sorte' },
+        { titulo: 'Neblina', descricao: 'Fumaça atrasa', tipo: 'reves' },
+        { titulo: 'Groove Plaza', descricao: 'Respire', tipo: 'normal' },
+
+        { titulo: 'Solo Legend', descricao: 'Solo épico', tipo: 'tema' },
+        { titulo: 'Drop Zone', descricao: 'Queda livre', tipo: 'normal' },
+        { titulo: 'Neon Falls', descricao: 'Descida', tipo: 'tema' },
+        { titulo: 'Card Sorte', descricao: 'Fortuna volta', tipo: 'sorte' },
+        { titulo: 'Batalha', descricao: 'Recue!', tipo: 'reves' },
+
+        { titulo: 'Lounge Vapor', descricao: 'Descanso', tipo: 'tema' },
+        { titulo: 'Remix Point', descricao: 'Recombine', tipo: 'normal' },
+        { titulo: 'Card Revés', descricao: 'Palco apagou', tipo: 'reves' },
+        { titulo: 'Holo-Bridge', descricao: 'Ponte luz', tipo: 'tema' },
+        { titulo: 'Sprunk Loop', descricao: 'Velocidade', tipo: 'sorte' },
+
+        { titulo: 'Eco Perdido', descricao: 'Volta beat', tipo: 'reves' },
+        { titulo: 'Neon Market', descricao: 'Troca', tipo: 'normal' },
+        { titulo: 'Synth Wave', descricao: 'Ondas sonoras', tipo: 'tema' },
+        { titulo: 'VR Session', descricao: 'Treino', tipo: 'sorte' },
+        { titulo: 'Feedback Loop', descricao: 'Eco infinito', tipo: 'reves' },
+
+        { titulo: 'Cabos Emaranhados', descricao: 'Desenrolar', tipo: 'reves' },
+        { titulo: 'Back to Beat', descricao: 'Casa neutra', tipo: 'normal' },
+        { titulo: 'Auto-Tune', descricao: 'Correção', tipo: 'tema' },
+        { titulo: 'Lucky Star', descricao: 'Estrela sorte', tipo: 'sorte' },
+        { titulo: 'Static Noise', descricao: 'Interferência', tipo: 'reves' },
+
+        { titulo: 'Harmony Hall', descricao: 'Sincronia', tipo: 'tema' },
+        { titulo: 'Sample Street', descricao: 'Coleta sons', tipo: 'normal' },
+        { titulo: 'Power Chord', descricao: 'Energia pura', tipo: 'tema' },
+        { titulo: 'Encore Time', descricao: 'Bis surpresa', tipo: 'sorte' },
+        { titulo: 'Broken Mic', descricao: 'Mic quebrado', tipo: 'reves' },
+
+        { titulo: 'Sound Check', descricao: 'Teste de som', tipo: 'normal' },
+        { titulo: 'Final Mix', descricao: 'Último ajuste', tipo: 'tema' },
+        { titulo: 'Golden Ticket', descricao: 'Passe VIP', tipo: 'sorte' },
+        { titulo: 'Backstage', descricao: 'Quase lá!', tipo: 'normal' },
+        { titulo: '🎤 PALCO', descricao: 'VITÓRIA!', tipo: 'meta' },
       ];
 
       const cartasSorte = [
@@ -947,6 +1284,7 @@
         rolarBtn.disabled = false;
         atualizarStatus();
         atualizarTabuleiro();
+        atualizarFeedDestaque();
         registrar(
           `${jogadores[0].personagem.nome} vs ${jogadores[1].personagem.nome} começou!`
         );
@@ -1067,9 +1405,38 @@
         }
       }
 
+      // Função para atualizar destaque do feed com cores da casa atual
+      function atualizarFeedDestaque() {
+        const feedJogo = document.getElementById('feedJogo');
+        if (!jogoIniciado || !jogadores[jogadorAtual]?.personagem) {
+          return;
+        }
+
+        const jogador = jogadores[jogadorAtual];
+        const casaAtual = casas[jogador.posicao];
+
+        // Define cores baseadas no tipo de casa
+        const coresCasa = {
+          tema: '#9981fc',
+          sorte: '#60f5c5',
+          reves: '#ff9db4',
+          normal: '#ffffff',
+        };
+
+        const corCasa = coresCasa[casaAtual.tipo] || coresCasa.normal;
+
+        feedJogo.style.borderColor = corCasa;
+        feedJogo.style.backgroundColor = '#ffffff';
+        feedJogo.style.boxShadow = `0 0 20px ${corCasa}50`;
+      }
+
       function verificarCasa(jogador) {
         const casaAtual = casas[jogador.posicao];
         mensagem.textContent = `${jogador.personagem.nome} está em ${casaAtual.titulo}.`;
+
+        // Atualiza destaque do feed com cor da casa atual
+        atualizarFeedDestaque();
+
         if (casaAtual.tipo === 'sorte') {
           aplicarCarta(jogador, cartasSorte, 'Sorte');
         } else if (casaAtual.tipo === 'reves') {
@@ -1088,6 +1455,10 @@
         cartaPainel.classList.add(
           tipo === 'Sorte' ? 'sorte-card' : 'reves-card'
         );
+        // Adiciona animação piscante
+        cartaPainel.classList.add('carta-nova');
+        setTimeout(() => cartaPainel.classList.remove('carta-nova'), 4500);
+
         cartaTipo.textContent = `${tipo} de ${jogador.personagem.nome}`;
         cartaTexto.textContent = carta.texto;
         registrar(`${tipo} para ${jogador.personagem.nome}: ${carta.texto}`);
@@ -1098,6 +1469,7 @@
       function avancarTurno() {
         jogadorAtual = jogadorAtual === 0 ? 1 : 0;
         atualizarStatus();
+        atualizarFeedDestaque();
         rolarBtn.disabled = false;
       }
 
@@ -1106,6 +1478,26 @@
         statusTurno.textContent = `Vez de ${
           jogador.personagem?.nome || '...'
         } ${extra}`;
+
+        // Adiciona destaque com cor do personagem ao status
+        if (jogador.personagem) {
+          const cor = jogador.personagem.cor;
+
+          // Garante contraste usando texto branco com sombra escura
+          statusTurno.style.color = '#ffffff';
+          statusTurno.style.fontWeight = 'bold';
+          statusTurno.style.textShadow = `0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5)`;
+          statusTurno.style.borderColor = cor;
+          statusTurno.style.backgroundColor = `${cor}90`;
+          statusTurno.style.boxShadow = `0 0 20px ${cor}60, inset 0 0 20px ${cor}40`;
+        } else {
+          statusTurno.style.color = '';
+          statusTurno.style.fontWeight = '';
+          statusTurno.style.textShadow = '';
+          statusTurno.style.borderColor = 'transparent';
+          statusTurno.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+          statusTurno.style.boxShadow = '';
+        }
       }
 
       function registrar(texto) {
@@ -1118,22 +1510,60 @@
       }
 
       function atualizarTabuleiro() {
+        // Limpa todas as áreas de piões e remove classes de jogador presente
         document
           .querySelectorAll('.piao-area')
           .forEach((area) => (area.innerHTML = ''));
-        jogadores.forEach((jogador) => {
+        document.querySelectorAll('.casa').forEach((casa) => {
+          casa.classList.remove('jogador-presente-1', 'jogador-presente-2');
+          casa.style.borderColor = '';
+          casa.style.borderImage = '';
+        });
+
+        // Agrupa jogadores por posição
+        const jogadoresPorPosicao = {};
+        jogadores.forEach((jogador, idx) => {
           if (!jogador.personagem) return;
-          const casaEl = document.querySelector(
-            `.casa[data-ordem="${jogador.posicao}"] .piao-area`
-          );
+          const pos = jogador.posicao;
+          if (!jogadoresPorPosicao[pos]) {
+            jogadoresPorPosicao[pos] = [];
+          }
+          jogadoresPorPosicao[pos].push({ jogador, idx });
+        });
+
+        // Aplica estilos e piões
+        Object.keys(jogadoresPorPosicao).forEach((pos) => {
+          const casaEl = document.querySelector(`.casa[data-ordem="${pos}"]`);
           if (!casaEl) return;
-          const token = document.createElement('div');
-          token.className = 'piao';
-          const img = document.createElement('img');
-          img.src = jogador.personagem.imagem;
-          img.alt = jogador.personagem.nome;
-          token.appendChild(img);
-          casaEl.appendChild(token);
+
+          const jogadoresNaCasa = jogadoresPorPosicao[pos];
+
+          if (jogadoresNaCasa.length === 1) {
+            // Um jogador - borda com cor do personagem
+            const cor = jogadoresNaCasa[0].jogador.personagem.cor;
+            casaEl.classList.add('jogador-presente-1');
+            casaEl.style.borderColor = cor;
+          } else if (jogadoresNaCasa.length === 2) {
+            // Dois jogadores - borda dividida
+            const cor1 = jogadoresNaCasa[0].jogador.personagem.cor;
+            const cor2 = jogadoresNaCasa[1].jogador.personagem.cor;
+            casaEl.classList.add('jogador-presente-2');
+            casaEl.style.borderImage = `linear-gradient(135deg, ${cor1} 0%, ${cor1} 50%, ${cor2} 50%, ${cor2} 100%) 1`;
+          }
+
+          // Adiciona os piões
+          const piaoArea = casaEl.querySelector('.piao-area');
+          if (!piaoArea) return;
+
+          jogadoresNaCasa.forEach(({ jogador }) => {
+            const token = document.createElement('div');
+            token.className = 'piao';
+            const img = document.createElement('img');
+            img.src = jogador.personagem.imagem;
+            img.alt = jogador.personagem.nome;
+            token.appendChild(img);
+            piaoArea.appendChild(token);
+          });
         });
       }
 
@@ -1144,8 +1574,6 @@
           const div = document.createElement('div');
           div.className = `casa ${casa.tipo || ''}`;
           div.dataset.ordem = indice;
-          div.style.left = casa.x + '%';
-          div.style.top = casa.y + '%';
           const numero = document.createElement('span');
           numero.className = 'numero';
           numero.textContent = indice + 1;
@@ -1158,29 +1586,12 @@
           div.append(numero, titulo, desc, piaoArea);
           tabuleiro.appendChild(div);
         });
-        desenharRota();
       }
 
-      function desenharRota() {
-        const rota = document.getElementById('rota');
-        rota.innerHTML = '';
-        const track = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'path'
-        );
-        track.setAttribute(
-          'd',
-          'M8 90 C 12 78 28 76 34 66 C 40 56 30 50 24 44 C 18 38 20 30 28 28 C 44 24 60 20 74 26 C 84 30 84 44 72 50 C 60 56 46 58 42 64 C 38 70 46 78 56 80 C 68 84 82 86 90 90'
-        );
-        track.setAttribute('class', 'track');
-        const border = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'path'
-        );
-        border.setAttribute('d', track.getAttribute('d'));
-        border.setAttribute('class', 'border');
-        rota.append(track, border);
-      }
+      // Toggle da linha do tempo
+      document.querySelector('.historico h3').addEventListener('click', () => {
+        document.querySelector('.historico').classList.toggle('collapsed');
+      });
 
       montarSeletores();
       montarTabuleiro();
